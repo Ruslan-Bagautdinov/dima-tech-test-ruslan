@@ -1,6 +1,6 @@
 import hashlib
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Query, HTTPException, status
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,11 +21,9 @@ router = APIRouter()
 async def verify_signature(payload: WebhookPayload):
     logger.info("Verifying webhook signature")
     secret_key = SECRET_KEY
-    sorted_payload = sorted(payload.dict().items(), key=lambda x: x[0])
-    sorted_payload.pop()
-    sorted_payload.append(("secret_key", secret_key))
-    payload_str = ''.join([str(v) for k, v in sorted_payload])
-    calculated_signature = hashlib.sha256(payload_str.encode()).hexdigest()
+    # Concatenate values in alphabetical order along with SECRET_KEY
+    data_to_hash = f"{payload.account_id}{payload.amount}{payload.transaction_id}{payload.user_id}{secret_key}"
+    calculated_signature = hashlib.sha256(data_to_hash.encode()).hexdigest()
     return calculated_signature == payload.signature
 
 
@@ -58,3 +56,24 @@ async def process_webhook(payload: WebhookPayload, session: AsyncSession = Depen
 
     logger.info("Payment processed successfully")
     return {"detail": "Payment processed successfully"}
+
+
+@router.get("/generate_webhook_json")
+async def generate_webhook_json(
+        transaction_id: str = Query(..., description="Transaction ID"),
+        user_id: int = Query(..., description="User ID"),
+        account_id: int = Query(..., description="Account ID"),
+        amount: float = Query(..., description="Amount")
+):
+    data_to_hash = f"{account_id}{amount}{transaction_id}{user_id}{SECRET_KEY}"
+    signature = hashlib.sha256(data_to_hash.encode()).hexdigest()
+
+    response_json = {
+        "transaction_id": transaction_id,
+        "user_id": user_id,
+        "account_id": account_id,
+        "amount": amount,
+        "signature": signature
+    }
+
+    return response_json

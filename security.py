@@ -54,17 +54,25 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     logger.info("Getting current user")
     try:
         token = credentials.credentials
+        logger.info(f"Token received: {token}")  # Corrected logging statement
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        logger.info(f"Token payload decoded: {payload}")
         if payload.get("type") != "access":
+            logger.warning("Invalid token type")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
         email: str = payload.get("sub")
         if email is None:
+            logger.warning("Email not found in token payload")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
+        logger.info(f"Fetching user by email: {email}")
         user = await get_user_by_email(session, email)
         if user is None:
+            logger.warning(f"User not found for email: {email}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        logger.info(f"User found: {user}")
         return user
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as e:
+        logger.error(f"JWT decoding error: {e}")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
 
 

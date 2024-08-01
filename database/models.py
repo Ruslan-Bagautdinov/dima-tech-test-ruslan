@@ -12,7 +12,7 @@ class User(Base):
     full_name = Column(String)
     role = Column(String, default="user")
 
-    accounts = relationship("Account", back_populates="owner")
+    accounts = relationship("Account", back_populates="owner", cascade="all, delete-orphan")
 
     @validates('role')
     def validate_role(self, key, role):
@@ -25,10 +25,10 @@ class Account(Base):
     __tablename__ = "accounts"
     id = Column(Integer, primary_key=True, index=True)
     balance = Column(Float, default=0.0)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
 
     owner = relationship("User", back_populates="accounts")
-    payments = relationship("Payment", back_populates="account")
+    payments = relationship("Payment", back_populates="account", cascade="all, delete-orphan")
 
 
 class Payment(Base):
@@ -36,6 +36,6 @@ class Payment(Base):
     id = Column(Integer, primary_key=True, index=True)
     transaction_id = Column(String, unique=True, index=True)
     amount = Column(Float)
-    account_id = Column(Integer, ForeignKey("accounts.id"))
+    account_id = Column(Integer, ForeignKey("accounts.id", ondelete="CASCADE"))
 
     account = relationship("Account", back_populates="payments")

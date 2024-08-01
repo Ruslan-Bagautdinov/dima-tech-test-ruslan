@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator
+from typing import Optional
 
 
 class UserLogin(BaseModel):
@@ -14,9 +15,15 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    email: str
-    full_name: str
-    role: str
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    role: Optional[str] = None
+
+    @field_validator('role')
+    def validate_role(cls, role):
+        if role not in ['user', 'admin']:
+            raise ValueError("Role must be 'user' or 'admin'")
+        return role
 
 
 class UserResponse(BaseModel):

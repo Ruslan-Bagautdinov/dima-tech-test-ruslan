@@ -35,3 +35,5 @@ async def login(user: UserLogin, session: AsyncSession = Depends(get_session)):
     )
     logger.info(f"User with email: {user_data.email} authenticated successfully")
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
+
