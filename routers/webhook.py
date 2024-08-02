@@ -26,7 +26,16 @@ async def verify_signature(payload: WebhookPayload):
     return calculated_signature == payload.signature
 
 
-@router.post("/webhook")
+@router.post("/webhook", description="""
+Обработать вебхук для обработки платежа.
+
+- **Тело запроса**: Данные вебхука в формате `WebhookPayload`.
+  - **transaction_id**: Уникальный идентификатор транзакции (строка).
+  - **user_id**: Идентификатор пользователя, которому зачисляется платеж (целое число).
+  - **account_id**: Идентификатор счета пользователя, на который зачисляется платеж (целое число).
+  - **amount**: Сумма платежа (число с плавающей точкой).
+  - **signature**: Цифровая подпись, подтверждающая целостность данных (строка). Подпись должна быть корректной для успешной обработки.
+""")
 async def process_webhook(payload: WebhookPayload, session: AsyncSession = Depends(get_session)):
     logger.info("Processing webhook")
     if not await verify_signature(payload):
@@ -57,7 +66,16 @@ async def process_webhook(payload: WebhookPayload, session: AsyncSession = Depen
     return {"detail": "Payment processed successfully"}
 
 
-@router.get("/generate_webhook_json")
+@router.get("/generate_webhook_json", description="""
+Сгенерировать JSON для тестирования вебхука.
+
+- **transaction_id**: Уникальный идентификатор транзакции (строка).
+- **user_id**: Идентификатор пользователя, которому зачисляется платеж (целое число).
+- **account_id**: Идентификатор счета пользователя, на который зачисляется платеж (целое число).
+- **amount**: Сумма платежа (число с плавающей точкой).
+
+**Возвращает**: JSON объект, содержащий `transaction_id`, `user_id`, `account_id`, `amount` и корректную `signature`. Этот JSON можно использовать для отправки запроса на конечную точку `/webhook` для проверки.
+""")
 async def generate_webhook_json(
         transaction_id: str = Query(..., description="Transaction ID"),
         user_id: int = Query(..., description="User ID"),
@@ -76,8 +94,3 @@ async def generate_webhook_json(
     }
 
     return response_json
-
-
-
-
-
