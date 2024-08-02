@@ -3,5 +3,4 @@
 .git/
 .stuff/
 **/__pycache__/
-alembic/versions/*
 .env
