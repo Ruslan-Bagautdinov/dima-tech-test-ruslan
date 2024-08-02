@@ -21,7 +21,6 @@ router = APIRouter()
 async def verify_signature(payload: WebhookPayload):
     logger.info("Verifying webhook signature")
     secret_key = SECRET_KEY
-    # Concatenate values in alphabetical order along with SECRET_KEY
     data_to_hash = f"{payload.account_id}{payload.amount}{payload.transaction_id}{payload.user_id}{secret_key}"
     calculated_signature = hashlib.sha256(data_to_hash.encode()).hexdigest()
     return calculated_signature == payload.signature
@@ -77,3 +76,8 @@ async def generate_webhook_json(
     }
 
     return response_json
+
+
+
+
+
