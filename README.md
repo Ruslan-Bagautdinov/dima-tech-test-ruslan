@@ -32,8 +32,8 @@
 1. **Клонируйте репозиторий:**
 
 ```sh
-git clone https://github.com/your-repo/your-fastapi-app.git
-cd your-fastapi-app
+git clone https://github.com/Ruslan-Bagautdinov/dima-tech-test-ruslan.git
+cd dima-tech-test-ruslan
 ```
 
 2. **Соберите и запустите контейнеры с помощью Docker Compose:**
@@ -53,8 +53,8 @@ http://localhost:8000/
 1. **Клонируйте репозиторий:**
 
 ```sh
-git clone https://github.com/your-repo/your-fastapi-app.git
-cd your-fastapi-app
+git clone https://github.com/Ruslan-Bagautdinov/dima-tech-test-ruslan.git
+cd dima-tech-test-ruslan
 ```
 
 2. **Создайте базу данных на вашем сервере PostgreSQL:**
