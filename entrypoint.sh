@@ -2,7 +2,7 @@
 
 wait_for_db() {
     echo "Waiting for database..."
-    while ! nc -z db 5432; do
+    until pg_isready -h db -U postgres -d fastapi; do
         sleep 1
     done
     echo "Database is ready!"
